@@ -9,23 +9,26 @@ public class Cart implements Serializable {
     }
 
     public void addToCart(Book book) {
+
         if (book == null) {
             throw new IllegalArgumentException("Cannot add a null book to the cart.");
         }
         if (book.getStock() == 0) {
             throw new IllegalArgumentException("SORRY, That book is not available right now");
         }
+        boolean flag=false;
         for (CartItem item : items) {
             if (item.getBook().getBookId().equals(book.getBookId()))
             {
                 item.setQuantity(item.getQuantity() + 1);
                 System.out.printf("Increased quantity of '%s' to %d.%n", book.getTitle(), item.getQuantity());
-                return;
+                flag=true;
+                break;
             }
         }
-
-        items.add(new CartItem(book, 1));
-        System.out.printf("Added '%s' to the cart with quantity 1.%n", book.getTitle());
+        if(!flag){
+            items.add(new CartItem(book, 1));
+        }
     }
 
     public void removeFromCart(Book book) {
@@ -37,7 +40,7 @@ public class Cart implements Serializable {
             if (item.getBook().getBookId().equals(book.getBookId())) {
                 items.remove(item);
                 System.out.printf("Removed '%s' from the cart.%n", book.getTitle());
-                return; //I used return instead of break to exit from the entire for each loop as soon as the condition is true
+                break; //I used return instead of break to exit from the entire for each loop as soon as the condition is true
             }
         }
         System.out.printf("Book '%s' not found in the cart.%n", book.getTitle());

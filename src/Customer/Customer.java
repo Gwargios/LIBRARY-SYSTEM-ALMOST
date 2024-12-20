@@ -17,28 +17,29 @@ public  class Customer extends Account implements Serializable {
 
     public Customer() {
         super();
+        orderHistory=new ArrayList<>();
         this.cart = new Cart();
         totalCustomerCount++;
     }
     public void CreateBorrower(String name){
         borrower_info = new Borrower(name,getAccount_Id());
     }
-    public void viewAvailableBooks(List<Book> books) {
-        System.out.println("Available books:");
-        for (Book book : books) {
-            if (book.getStock() > 0) {
-                System.out.println("- " + book.getTitle() + " by " + book.getAuthor() + " (Stock: " + book.getStock() + ")");
-            }
-        }
-    }
-    public void viewUnavailableBooks(List<Book> books) {
-        System.out.println("Unavailable books:");
-        for (Book book : books) {
-            if (book.getStock() == 0) {
-                System.out.println("- " + book.getTitle() + " by " + book.getAuthor() + " (Out of stock)");
-            }
-        }
-    }
+//    public void viewAvailableBooks(List<Book> books) {
+//        System.out.println("Available books:");
+//        for (Book book : books) {
+//            if (book.getStock() > 0) {
+//                System.out.println("- " + book.getTitle() + " by " + book.getAuthor() + " (Stock: " + book.getStock() + ")");
+//            }
+//        }
+//    }
+//    public void viewUnavailableBooks(List<Book> books) {
+//        System.out.println("Unavailable books:");
+//        for (Book book : books) {
+//            if (book.getStock() == 0) {
+//                System.out.println("- " + book.getTitle() + " by " + book.getAuthor() + " (Out of stock)");
+//            }
+//        }
+//    }
     public boolean searchBooksByAuthor(List<Book> books, String author)throws SearchNotFound {
         System.out.println("Searching for books by author: '" + author + "'");
         for (Book book : books) {
@@ -81,6 +82,12 @@ public  class Customer extends Account implements Serializable {
         orderHistory.add(order);
         cart.clearCart();
     }
+    public void displayBooksForPurchase(List<Book> books) {
+        System.out.println("Available Books for Purchase:");
+        for (Book book : books) {
+            System.out.println("Title: " + book.getTitle() + ", Price: " + book.getPrice() + ", Stock: " + book.getStock());
+        }
+    }
 
     public void addToCart(Book book) {
         cart.addToCart(book);
@@ -94,13 +101,57 @@ public  class Customer extends Account implements Serializable {
         cart.displayCart();
     }
 
-    public Borrower getBorrower_info(){
+    public Borrower GetBorrower_info(){
         return borrower_info;
+    }
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public static void setTotalCustomerCount(int totalCustomerCount) {
+        Customer.totalCustomerCount = totalCustomerCount;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
+    public void setOrderHistory(List<Order> orderHistory) {
+        this.orderHistory = orderHistory;
+    }
+
+    public void setBorrower_info(Borrower borrower_info) {
+        this.borrower_info = borrower_info;
+    }
+
+    public static int getTotalCustomerCount() {
+        return totalCustomerCount;
+    }
+
+    public List<Order> getOrderHistory() {
+        return orderHistory;
     }
 
     public static int getCustomerCount() {
         return totalCustomerCount;
     }
+    public void Payment(String CardholderName,String CardNumber)throws PaymentFailedException{
+
+        if (CardholderName.isEmpty() || CardNumber.length() < 13) {
+            throw new PaymentFailedException("Invalid Credit Card Details. Payment Failed.");
+        }
+        System.out.println("Payment Successful by Credit Card.");
+    }
+    public void OrderHistory()throws NoOrdersFound{
+        if(orderHistory.isEmpty()){
+            throw new NoOrdersFound();
+        }
+        for(Order order:orderHistory){
+            order.displayOrderDetails();
+        }
+    }
+
 
 
 }

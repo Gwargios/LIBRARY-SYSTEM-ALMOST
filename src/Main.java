@@ -1,25 +1,23 @@
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 import Account.*;
 import Administrator.*;
 import Book.*;
-import Borrower.*;
 import Cart.*;
 import Customer.*;
-import Discount.*;
-import Notification.*;
-import Order.*;
-import Rating.*;
 import Transaction.*;
+import Borrower.*;
+import Order.Order;
 
-public class Main {
+public class Main  {
     public static Scanner Input(){
         Scanner Input=new Scanner(System.in);
         return Input;
     }
-    public static  void ReadingData(ArrayList<Account> Accounts){
+    public static  void ReadingData(ArrayList<Account> Accounts,ArrayList<Book>Books){
         File file=new File("Details.ser");
         System.out.println(file.getAbsolutePath());
         try{
@@ -29,6 +27,9 @@ public class Main {
                 if(object instanceof Account){
                     Accounts.add((Account)object);
                 }
+                if(object instanceof Book){
+                    Books.add((Book) object);
+                }
             }
         }  catch (EOFException eof) {
             System.out.println("End of file reached.");
@@ -36,11 +37,14 @@ public class Main {
             System.out.println("Error reading from file: " + e.getMessage());
         }
     }
-    public static void WritingData(ArrayList<Account> Accounts){
+    public static void WritingData(ArrayList<Account> Accounts,ArrayList<Book>Books){
         File file=new File("Details.ser");
         try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file))) {
             for (Account user : Accounts) {
                 outputStream.writeObject(user);
+            }
+            for (Book book : Books) {
+                outputStream.writeObject(book);
             }
             System.out.println("Accounts saved successfully!");
         } catch (IOException e) {
@@ -52,13 +56,17 @@ public class Main {
         ArrayList<Account> Users= new ArrayList<>();
         ArrayList<Customer>Customers=new ArrayList<>();
         ArrayList<Book>Books=new ArrayList<>();
-        ReadingData(Users);
-//        Administrator Admin1=new Administrator();
-//        Customer Cust1=new Customer();
-//        Admin1.SignUp("Haitch","7112005aA@","Ahmed","ahmedhesham@gmail.com","01210650900","masr el gedida");
-//        Cust1.SignUp("Haitch2","7112005aA@","Ahmed","ahmedhesham@gmail.com","01210650900","masr el gedida");
-//        Users.add(Admin1);
-//        Users.add(Cust1);
+        ReadingData(Users,Books);
+        Administrator Admin1=new Administrator();
+        Customer Cust1=new Customer();
+        Book book1=new Book("Lion King","ahmed",2024,true,24F,"sci fi",5);
+        Book book100=new Book("My Life","ahmed",2024,true,24F,"sci fi",5);
+        Admin1.SignUp("Haitch","7112005aA@","Ahmed","ahmedhesham@gmail.com","01210650900","masr el gedida");
+        Cust1.SignUp("Haitch2","7112005aA@","Ahmed","ahmedhesham@gmail.com","01210650900","masr el gedida");
+        Users.add(Admin1);
+        Users.add(Cust1);
+        Books.add(book1);
+        Books.add(book100);
         int Choice;
         do {
             System.out.println("1-LOG IN" + '\t' + "2-SIGN UP" + '\t' + "3-EXIT");
@@ -241,7 +249,7 @@ public class Main {
                                         Choice4 = Input().nextInt();
                                     } while (Choice4 == 1);
                                 } else if (user instanceof Customer) {
-                                    Customer Customer = (Customer) user;
+                                    Customer customer = (Customer) user;
                                     int CustInput;
                                     do {
                                         System.out.println("1. Search\n" +
@@ -249,11 +257,12 @@ public class Main {
                                                 "3. Borrow a Book ( Add Transaction )\n" +
                                                 "4. Return Borrowed Books\n" +
                                                 "5. Show History of Transaction\n" +
-                                                "6. Available Discount\n" +
+                                                //"6. Available Discount\n" +
                                                 "7. Available Notification\n" +
-                                                "8. Rate a Book\n" +
-                                                "9. Rate Us\n" +
-                                                "10.Log Out");
+                                                "8. View Order History\n"+
+                                                "9. Rate a Book\n" +
+                                                "10. Rate Us\n" +
+                                                "11.Log Out");
                                         CustInput = Input().nextInt();
                                         switch (CustInput) {
                                             case 1: {
@@ -267,7 +276,7 @@ public class Main {
                                                                 try {
                                                                     System.out.print("ENTER AUTHOR NAME: ");
                                                                     String AuthorName = Input().nextLine();
-                                                                    Customer.searchBooksByAuthor(Books, AuthorName);
+                                                                    customer.searchBooksByAuthor(Books, AuthorName);
                                                                 } catch (SearchNotFound e) {
                                                                     System.out.println(e.getMessage());
                                                                     System.out.println("SEARCH AGAIN?" + '\n' + "1-YES" + '\t' + "2-NO");
@@ -285,7 +294,7 @@ public class Main {
                                                                 try {
                                                                     System.out.print("ENTER TITLE NAME: ");
                                                                     String TitleName = Input().nextLine();
-                                                                    Customer.searchBooksByAuthor(Books, TitleName);
+                                                                    customer.searchBooksByAuthor(Books, TitleName);
                                                                 } catch (SearchNotFound e) {
                                                                     System.out.println(e.getMessage());
                                                                     System.out.println("SEARCH AGAIN?" + '\n' + "1-YES" + '\t' + "2-NO");
@@ -301,8 +310,292 @@ public class Main {
 
                                                 }
                                             }
+                                            case 2: {
+
+                                                customer.displayBooksForPurchase(Books);
+                                                int PurchaseChoice;
+                                                do {
+                                                    System.out.print("Add A Book To Cart? (1-YES, 2-NO): ");
+                                                    PurchaseChoice = Input().nextInt();
+                                                    if (PurchaseChoice == 1) {
+                                                        System.out.print("Enter the title of the book you want to add: ");
+                                                        String title = Input().nextLine();
+                                                        Book book = null;
+                                                        for (Book b : Books) {
+                                                            if (b.getTitle().equals(title)) {
+                                                                book = b;
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (book != null) {
+                                                            customer.addToCart(book);
+                                                            customer.viewCart();
+                                                        } else {
+                                                            System.out.println("Book not found.");
+                                                        }
+                                                    }
+                                                } while (PurchaseChoice == 1);
+                                                customer.viewCart();
+                                                int cartChoice;
+                                                do {
+                                                    System.out.println("What Would You Like To Do Next? ");
+                                                    System.out.println("1. Add Another Book to Cart");
+                                                    System.out.println("2. Change The Quantity Of Any Book In The Cart");
+                                                    System.out.println("3. Clear Cart From All Books");
+                                                    System.out.println("4. Remove A Book Entirely From Cart");
+                                                    System.out.println("5. Already Done Shopping");
+                                                    System.out.println("6. View Cart");
+                                                    cartChoice = Input().nextInt();
+                                                    switch (cartChoice) {
+                                                        case 1:
+                                                            System.out.print("Enter the title of the book you want to add: ");
+                                                            String title = Input().nextLine();
+                                                            Book book = null;
+                                                            for (Book b : Books) {
+                                                                if (b.getTitle().equals(title)) {
+                                                                    book = b;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (book != null) {
+                                                                customer.addToCart(book);
+                                                                customer.viewCart();
+                                                            } else {
+                                                                System.out.println("Book not found."); //change it to throw an exception
+                                                            }
+                                                            break;
+                                                        case 2:
+                                                            System.out.print("Enter the title of the book you want to change quantity: ");
+                                                            String title2 = Input().nextLine();
+                                                            Book book2 = null;
+                                                            for (Book b : Books) {
+                                                                if (b.getTitle().equals(title2)) {
+                                                                    book2 = b;
+                                                                    break;
+                                                                }
+                                                            }
+
+                                                            if (book2 != null) {
+                                                                System.out.print("Enter the new quantity: ");
+                                                                int quantity = Input().nextInt();
+                                                                for(CartItem item:customer.getCart().getItems()){
+                                                                    if(item.getBook().getTitle().equals(title2)){
+                                                                        item.setQuantity(quantity);
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                customer.viewCart();
+                                                            } else {
+                                                                System.out.println("Book not found."); //replace it with exception
+                                                            }
+                                                            break;
+                                                        case 3:
+                                                            customer.getCart().clearCart();
+                                                            customer.viewCart();
+                                                            break;
+                                                        case 4:
+                                                            System.out.print("Enter the title of the book you want to remove: ");
+                                                            String title3 = Input().nextLine();
+                                                            Book book3 = null;
+                                                            for (Book b : Books) {
+                                                                if (b.getTitle().equals(title3)) {
+                                                                    book3 = b;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (book3 != null) {
+                                                                customer.removeFromCart(book3);
+                                                                customer.viewCart();
+                                                            } else {
+                                                                System.out.println("Book not found.");
+                                                            }
+                                                            break;
+                                                        case 5:
+                                                            customer.placeOrder();
+                                                            customer.getOrderHistory().getLast().displayOrderDetails();
+                                                            int orderChoice;
+                                                            do {
+                                                                System.out.println("What Would You Like To Do Next?");
+                                                                System.out.println("1. Change Order Details");
+                                                                System.out.println("2. Cancel Order");
+                                                                System.out.println("3. Finish and Choose Payment Method");
+                                                                orderChoice = Input().nextInt();
+                                                                switch (orderChoice) {
+                                                                    case 1:
+                                                                        System.out.println("1. Change Quantity for a Specific Order Item");
+                                                                        System.out.println("2. Remove an Order Item");
+                                                                        int orderDetailChoice = Input().nextInt();
+                                                                        switch (orderDetailChoice) {
+                                                                            case 1:
+                                                                                System.out.print("Enter the title of the book you want to change quantity: ");
+                                                                                String title4 = Input().nextLine();
+                                                                                Book book4 = null;
+                                                                                for (Book b : Books) {
+                                                                                    if (b.getTitle().equals(title4)) {
+                                                                                        book4 = b;
+                                                                                        break;
+                                                                                    }
+                                                                                }
+                                                                                if (book4 != null) {
+                                                                                    System.out.print("Enter the new quantity: ");
+                                                                                    int quantity2 = Input().nextInt();
+                                                                                    for(CartItem item:customer.getCart().getItems()){
+                                                                                        if(item.getBook().getTitle().equals(title4)){
+                                                                                            item.setQuantity(quantity2);
+                                                                                            break;
+                                                                                        }
+                                                                                    }
+                                                                                    customer.getOrderHistory().getLast().displayOrderDetails();
+                                                                                } else {
+                                                                                    System.out.println("Book not found.");
+                                                                                }
+                                                                                break;
+                                                                            case 2:
+                                                                                System.out.print("Enter the title of the book you want to remove: ");
+                                                                                String title5 = Input().nextLine();
+                                                                                Book book5 = null;
+                                                                                for (Book b : Books) {
+                                                                                    if (b.getTitle().equals(title5)) {
+                                                                                        book5 = b;
+                                                                                        break;
+                                                                                    }
+                                                                                }
+                                                                                if (book5 != null) {
+                                                                                    customer.getOrderHistory().getLast().removeItem(book5);
+                                                                                    customer.getOrderHistory().getLast().displayOrderDetails();
+                                                                                } else {
+                                                                                    System.out.println("Book not found.");
+                                                                                }
+                                                                                break;
+                                                                        }
+                                                                        break;
+                                                                    case 2:{
+                                                                        customer.getOrderHistory().remove(customer.getOrderHistory().getLast());
+                                                                        System.out.println("Order Cancelled Successfully");
+                                                                    }
+                                                                        break;
+                                                                    case 3:
+                                                                        int paymentMethod;
+                                                                        do {
+                                                                            System.out.println("Payment Method: ");
+                                                                            System.out.println("1. Cash");
+                                                                            System.out.println("2. Credit Card");
+                                                                             paymentMethod = Input().nextInt();
+                                                                            switch (paymentMethod) {
+                                                                                case 1:
+                                                                                    System.out.println("Please Prepare " + customer.getOrderHistory().getLast().getTotalAmount() + " For delivery Person");
+                                                                                    break;
+                                                                                case 2:
+                                                                                    System.out.print("Enter Cardholder Name: ");
+                                                                                    String cardholderName = Input().nextLine();
+                                                                                    System.out.print("Enter Card Number: ");
+                                                                                    String cardNumber = Input().next();
+                                                                                    try {
+                                                                                        customer.Payment(cardholderName, cardNumber);
+                                                                                    } catch (PaymentFailedException e) {
+                                                                                        System.out.println(e.getMessage());
+                                                                                        paymentMethod = 0;
+                                                                                    }
+                                                                                    break;
+                                                                            }
+                                                                        }while(paymentMethod==0);
+                                                                        break;
+                                                                }
+                                                            } while (orderChoice != 3);
+                                                            break;
+                                                        case 6:{
+                                                            customer.viewCart();
+                                                        }
+                                                    }
+                                                } while (cartChoice != 5);
+                                                break;
+                                            }
+                                            case 3: {
+                                                //********borrow Transaction ******* Sara Tarek ************
+
+//                public void Add_New_Transaction () {
+                                                Transaction Temp_Transaction = new Transaction();
+                                                System.out.println("New Transaction:");
+                                                System.out.println("---------------------------------------------------");
+                                                int trans_choice=0;
+                                                do {
+                                                    if (customer.GetBorrower_info().Num_Of_borrowed_Books() < customer.GetBorrower_info().GetMaxBorrowedBooks()) {
+                                                        // list to show the available book
+                                                        customer.GetBorrower_info().ShowBooksForBorrowTransaction(Books);
+                                                        Book Temp_book = null;
+                                                        System.out.println("Enter the Book Id: ");
+                                                        String Temp_Book_Id = Input().next();
+                                                        boolean book_Exists = false;
+                                                        for (int i = 0; i < Books.size(); i++) {
+                                                            Temp_book = Books.get(i);
+                                                            if (Temp_Book_Id.equals(Temp_book.getBookId()) && Temp_book.isAvailable()) {
+                                                                book_Exists = true;
+                                                            }
+                                                            if (book_Exists)
+                                                                break;
+
+                                                        }
+                                                        if (!(book_Exists)) {
+                                                            System.out.println("Book Is not found!");
+                                                        } else {
+
+                                                            Temp_Transaction.getBookList().add(Temp_book);
+                                                            System.out.println("The Book has been added successfully. ");
+                                                            System.out.println("1. Add another book\n2. Complete Transaction\n3. Cancel Transaction");
+                                                             trans_choice = Input().nextInt();
+                                                            switch (trans_choice) {
+                                                                case 1: {
+                                                                    // call the method of adding a new book
+                                                                    break;
+                                                                }
+                                                                case 2: {
+                                                                    Temp_Transaction.getBookList().toString().trim();
+                                                                    customer.GetBorrower_info();
+                                                                    // trim the arraylist of books within Temp_Transaction
+                                                                    //add Temp_Transaction to the current customer arraylist of Transaction
+                                                                    //add Temp_Transaction to the arraylist of System Transactions
+                                                                    System.out.println("Transaction has been added successfully.");
+                                                                    break;
+                                                                }
+                                                                case 3: {
+                                                                    Temp_Transaction = null;
+                                                                    System.out.println("The Transaction has been cancelled.");
+                                                                    //calling the Method that contains the user dashboard
+
+                                                                }
+
+                                                            }
+                                                        }
+
+                                                    } else {
+                                                        if (Temp_Transaction.getBookList().isEmpty()) {
+                                                            System.out.println("Sorry...You have reached the maximum number of borrowed books!\n");
+                                                            System.out.println("---------------------------------------------------");
+                                                            System.out.println("1. Back to the Main Menu");
+
+                                                            //calling the function that contains the user dashboard
+
+                                                        } else {
+                                                            System.out.println("1. Complete Transaction\n2. Cancel Transaction");
+
+                                                        }
+
+
+                                                    }
+                                                }while(trans_choice==1);
+                                            }
+                                            case 8:{
+                                                try {
+                                                    customer.OrderHistory();
+                                                }catch (NoOrdersFound e){
+                                                    System.out.println(e.getMessage());
+                                                }
+                                            }
+                                            case 9:{
+
+                                            }
                                         }
-                                    } while (CustInput != 10);
+                                    } while (CustInput != 11);
 
 
                                 }
@@ -347,6 +640,6 @@ public class Main {
                 }while(CustInput==1);
             }
         }while(Choice!=3);
-        WritingData(Users);
+        WritingData(Users,Books);
     }
 }

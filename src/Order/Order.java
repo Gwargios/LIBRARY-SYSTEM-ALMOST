@@ -1,6 +1,10 @@
 package Order;
+import Book.Book;
+import Cart.CartItem;
+
+import java.io.Serializable;
 import java.util.List;
-public class Order {
+public class Order implements Serializable {
     private static int orderCounter = 1;
     private int orderId;
     private List<OrderItem> items;
@@ -76,6 +80,20 @@ public class Order {
         for (OrderItem item : items) {
             System.out.println("- " + item.getBook().getTitle() + " (Quantity: " + item.getQuantity() + ", Total Price: $" + item.getTotalPrice() + ")");        }
         System.out.println("Total Order Amount: $" + totalAmount);
+    }
+    public void removeItem(Book book) {
+        if (book == null) {
+            throw new IllegalArgumentException("Cannot remove a null book from the cart.");
+        }
+        for (OrderItem item : items)
+        {
+            if (item.getBook().getBookId().equals(book.getBookId())) {
+                items.remove(item);
+                System.out.printf("Removed '%s' from the cart.%n", book.getTitle());
+                break; //I used return instead of break to exit from the entire for each loop as soon as the condition is true
+            }
+        }
+        System.out.printf("Book '%s' not found in the cart.%n", book.getTitle());
     }
 
 }

@@ -17,7 +17,6 @@ public class Transaction {
     private double finePerDay = 10; // Late fee per day By default it's 10
 
     public Transaction(){
-
     }
 
     public Transaction( LocalDate borrowDate, LocalDate returnDate){

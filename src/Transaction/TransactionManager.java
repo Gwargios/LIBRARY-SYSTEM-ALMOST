@@ -13,7 +13,7 @@ import Book.*;
 public class TransactionManager {
     private static Set<Integer> transactionIDs = new HashSet<>();
     private Map<Integer, Transaction> transactionMap = new HashMap<>();
-    FileWriter fw;
+    //FileWriter fw;
 
 
     public void addTransaction(Book book, Borrower borrower, LocalDate borrowDate, LocalDate returnDate, int transactionID) throws IllegalArgumentException{
@@ -23,13 +23,13 @@ public class TransactionManager {
         Transaction t = new Transaction(borrowDate, returnDate);
         transactionMap.put(transactionID, t);
         transactionIDs.add(transactionID);
-        try {
-            fw = new FileWriter("Save.txt");
-            fw.append("Transaction ID: " + transactionID + " Book: " + book.getBookId() + " Borrower: " +
-                    borrower.GetBorrowerName() + " Borrow date: " + borrowDate + " Return Date: " + returnDate);
-        } catch (IOException ex) {
-            Logger.getLogger(TransactionManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            fw = new FileWriter("Save.txt");
+//            fw.append("Transaction ID: " + transactionID + " Book: " + book.getBookId() + " Borrower: " +
+//                    borrower.GetBorrowerName() + " Borrow date: " + borrowDate + " Return Date: " + returnDate);
+//        } catch (IOException ex) {
+//            Logger.getLogger(TransactionManager.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 
     }
 

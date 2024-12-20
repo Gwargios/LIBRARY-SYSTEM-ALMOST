@@ -120,14 +120,7 @@ public class Book {
     }
 
     public double getRating() {
-        if (ratingsList.isEmpty()) return 0.0;
-
-        double total = 0.0;
-        for (Double rating : ratingsList) {
-            total += rating;
-        }
-
-        return total / ratingsList.size();
+     return AverageRating;
     }
     public void setCategory(String category) {
         Category = category;
@@ -156,15 +149,15 @@ public class Book {
     public void setPrice(double price) {
         this.price = price;
     }
+    public void Rating(int rate){
+        AverageRating= CalculateTheAverageRating(rate);
+    }
 
 
     public void setBookRating(ArrayList<Rating> bookRating) {
         BookRating = bookRating;
     }
 
-    public void setAverageRating(float averageRating) {
-        AverageRating = averageRating;
-    }
 
 
 
