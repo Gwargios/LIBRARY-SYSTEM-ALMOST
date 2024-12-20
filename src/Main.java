@@ -262,7 +262,8 @@ public class Main  {
                                                 "8. View Order History\n"+
                                                 "9. Rate a Book\n" +
                                                 "10. Rate Us\n" +
-                                                "11.Log Out");
+                                                "11. Display All Available Books:\n" +    
+                                                "12.Log Out");
                                         CustInput = Input().nextInt();
                                         switch (CustInput) {
                                             case 1: {
@@ -594,8 +595,17 @@ public class Main  {
                                             case 9:{
 
                                             }
+                                            case 11:{
+                                                System.out.println("Displaying All Available Books:");
+                                                for (Book book : Books) {
+                                                    if (book.isAvailable()) {
+                                                        book.displayDetails();
+                                                        System.out.println();
+                                                    }
+                                                }
+                                            }    
                                         }
-                                    } while (CustInput != 11);
+                                    } while (CustInput != 12);
 
 
                                 }
